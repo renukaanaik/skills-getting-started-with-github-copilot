@@ -38,3 +38,20 @@ def test_duplicate_signup_is_rejected():
     second_response = client.post(f"/activities/{activity_name}/signup?email={email}")
     assert second_response.status_code == 400
     assert "already signed up" in second_response.json()["detail"].lower()
+
+
+def test_signup_for_unknown_activity_is_rejected():
+    response = client.post("/activities/Unknown Club/signup?email=student@mergington.edu")
+
+    assert response.status_code == 404
+    assert "activity not found" in response.json()["detail"].lower()
+
+
+def test_unregister_unknown_participant_is_rejected():
+    activity_name = "Basketball Club"
+    email = "missing@mergington.edu"
+
+    response = client.delete(f"/activities/{activity_name}/participants/{email}")
+
+    assert response.status_code == 404
+    assert "participant not found" in response.json()["detail"].lower()
